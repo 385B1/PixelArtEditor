@@ -7,6 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <Canvas x:Name="PixelCanvas"
+                Background="Gray"
+                Width="600"
+                Height="400"
+                MouseDown="Canvas_MouseDown" Margin="-100,0,0,0" />
     </Grid>
+
 </Window>
