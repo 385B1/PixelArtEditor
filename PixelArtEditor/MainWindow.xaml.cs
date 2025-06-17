@@ -17,7 +17,7 @@ namespace PixelArtEditor
     public partial class MainWindow : Window
     {
 
-        private int pixelSize = 20;
+        private int pixelSize = 13;
         public MainWindow() // when the application starts
         {
             InitializeComponent();
@@ -27,6 +27,22 @@ namespace PixelArtEditor
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e) // when the mouse is clicked on the canvas
         {
+            Point position = e.GetPosition(PixelCanvas); // get the position of the mouse click (relative to the canvas)
+            int x = (int)(position.X / pixelSize) * pixelSize; // calculate the x coordinate of the pixel
+            int y = (int)(position.Y / pixelSize) * pixelSize; // calculate the y coordinate of the pixel
+
+            Rectangle pixel = new Rectangle // create a rectangle to represent the pixel
+            {
+                Width = pixelSize, // set the width of the rectangle
+                Height = pixelSize, // set the height of the rectangle
+                Fill = Brushes.Red, // set the color of the rectangle
+                Stroke = Brushes.Black, // set the border color of the rectangle
+                StrokeThickness = 0 // set the border thickness of the rectangle
+            };
+            Canvas.SetLeft(pixel, x); // set the x coordinate of the rectangle
+            Canvas.SetTop(pixel, y); // set the y coordinate of the rectangle
+            PixelCanvas.Children.Add(pixel); // add the rectangle to the canvas
+
 
         }
 
