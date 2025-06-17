@@ -33,7 +33,7 @@ namespace PixelArtEditor
 
         private void DrawGrid() {
             
-            for (int x = 0; x < PixelCanvas.Width; x += pixelSize) // draw vertical lines
+            for (int x = 0; x <= PixelCanvas.Width; x += pixelSize) // draw vertical lines
             {
                 Line verticalLine = new Line
                 {
@@ -49,7 +49,7 @@ namespace PixelArtEditor
 
             }
 
-            for (int y = 0; y < PixelCanvas.Height; y += pixelSize) // draw horizontal lines
+            for (int y = 0; y <= PixelCanvas.Height; y += pixelSize) // draw horizontal lines
             {
                 Line horizontalLine = new Line
                 {

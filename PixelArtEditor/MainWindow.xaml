@@ -5,13 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PixelArtEditor"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        ResizeMode="CanMinimize"
+        Title="MainWindow" 
+        Height="450" Width="700">
     <Grid>
         <Canvas x:Name="PixelCanvas"
                 Background="Gray"
-                Width="600"
                 Height="400"
-                MouseDown="Canvas_MouseDown" Margin="-100,0,0,0" />
+                Width="400"
+                MouseDown="Canvas_MouseDown" Margin="0,0,200,0" />
     </Grid>
 
 </Window>
