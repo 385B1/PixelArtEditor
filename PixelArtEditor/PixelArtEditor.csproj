@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="View\" />
+    <Folder Include="View\UserControls\" />
   </ItemGroup>
 
 </Project>

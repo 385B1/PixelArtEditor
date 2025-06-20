@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         ResizeMode="CanMinimize"
         Title="MainWindow" 
-        Height="500" Width="700">
+        Height="470" Width="700">
     <DockPanel Margin="0,0,0,0">
         <Menu DockPanel.Dock="Top" Background="#CFCFCF">
             <MenuItem Header="_File">
@@ -19,13 +19,39 @@
             </MenuItem>
         </Menu>
         <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="440"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
             <Canvas x:Name="PixelCanvas"
              Background="Gray"
              Height="416"
              Width="416"
-             MouseDown="Canvas_MouseDown" Margin="10,10,274,74" >
+             MouseDown="Canvas_MouseDown" Margin="10,10,274,74"
+             Grid.Row="0">
 
             </Canvas>
+            
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Button
+                    x:Name="ColorPickerButton"
+                    Content="Color picker"
+                    FontSize="20"
+                    FontWeight="Bold"
+                    Click="Color_Picker_Window"/>
+            </Grid>
+            
 
 
         </Grid>

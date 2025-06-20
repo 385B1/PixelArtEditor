@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace PixelArtEditor
 {
@@ -23,14 +25,27 @@ namespace PixelArtEditor
         private int pixelSize = 13;
         private int pixels_placed = 0;
         private HashSet<int[]> mySet = new HashSet<int[]>(new IntArrayComparer());
-
+        private readonly DispatcherTimer _timer = new();
+        private readonly Brush[] _colors = new Brush[]
+{
+        Brushes.Red, Brushes.Green, Brushes.Blue, Brushes.Orange, Brushes.Purple};
+        private int _colorIndex = 0; // Index for the current color in the array
+        public Brush selected_color = Brushes.Red; // Default boja
 
         public MainWindow() // when the application starts
         {
 
             InitializeComponent();
             DrawGrid();
+            _timer.Interval = TimeSpan.FromSeconds(1); // Brojac za promjenu boja
+            _timer.Tick += Timer_Tick;
+            _timer.Start();
         }
+        private void Timer_Tick(object? sender,EventArgs e)
+        {
+            ColorPickerButton.Background = _colors[_colorIndex];
+            _colorIndex = (_colorIndex + 1) % _colors.Length;
+        } // Svake 2 sekunde se pokrece
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e) // when the mouse is clicked on the canvas
         {
             Point position = e.GetPosition(PixelCanvas); // get the position of the mouse click (relative to the canvas)
@@ -46,7 +61,7 @@ namespace PixelArtEditor
                 {
                     Width = pixelSize, // set the width of the rectangle
                     Height = pixelSize, // set the height of the rectangle
-                    Fill = Brushes.Red, // set the color of the rectangle
+                    Fill = selected_color, // set the color of the rectangle
                     Stroke = Brushes.Black, // set the border color of the rectangle
                     StrokeThickness = 0 // set the border thickness of the rectangle
                 };
@@ -115,6 +130,14 @@ namespace PixelArtEditor
                     return hash;
                 }
             }
+
+        }
+
+        private void Color_Picker_Window(object sender, RoutedEventArgs e)
+        {
+            var selectionWindow = new View.Windows.ColorSelectionBox();
+            selectionWindow.Owner = this;
+            selectionWindow.Show();
 
         }
     }
