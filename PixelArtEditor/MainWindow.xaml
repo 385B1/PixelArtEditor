@@ -26,12 +26,6 @@
              MouseDown="Canvas_MouseDown" Margin="10,10,274,74" >
 
             </Canvas>
-            <TextBlock x:Name="tb1"
-                Text="Pixels placed: "
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                FontSize="25"
-                />
 
 
         </Grid>

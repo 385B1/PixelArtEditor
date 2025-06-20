@@ -30,7 +30,6 @@ namespace PixelArtEditor
 
             InitializeComponent();
             DrawGrid();
-            // Console.WriteLine("Skibidi");
         }
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e) // when the mouse is clicked on the canvas
         {
@@ -54,7 +53,6 @@ namespace PixelArtEditor
                 Canvas.SetLeft(pixel, x); // set the x coordinate of the rectangle
                 Canvas.SetTop(pixel, y); // set the y coordinate of the rectangle
                 PixelCanvas.Children.Add(pixel); // add the rectangle to the canvas
-                tb1.Text = pixels_placed.ToString(); // Ovo sluzi samo za debuganje, ako je pixel vec postavljen i ovaj broj se ne mijenja, to znaci da ne stavlja novi pixel na taj vec postojeci pixel
                 pixels_placed++;
                 mySet.Add(cooridantes);
             }
