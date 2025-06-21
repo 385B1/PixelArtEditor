@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:PixelArtEditor"
         mc:Ignorable="d"
         ResizeMode="CanMinimize"
@@ -39,17 +40,16 @@
 
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <Button
+                <xctk:ColorPicker
+                    Grid.Row="0"
+                    Grid.Column="0"
                     x:Name="ColorPickerButton"
-                    Content="Color picker"
-                    FontSize="20"
-                    FontWeight="Bold"
-                    Click="Color_Picker_Window"/>
+                    />
             </Grid>
             
 

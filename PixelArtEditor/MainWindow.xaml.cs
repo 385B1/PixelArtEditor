@@ -14,6 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
+
+
+
 namespace PixelArtEditor
 {
     /// <summary>
@@ -37,15 +40,7 @@ namespace PixelArtEditor
 
             InitializeComponent();
             DrawGrid();
-            _timer.Interval = TimeSpan.FromSeconds(1); // Brojac za promjenu boja
-            _timer.Tick += Timer_Tick;
-            _timer.Start();
         }
-        private void Timer_Tick(object? sender,EventArgs e)
-        {
-            ColorPickerButton.Background = _colors[_colorIndex];
-            _colorIndex = (_colorIndex + 1) % _colors.Length;
-        } // Svake 2 sekunde se pokrece
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e) // when the mouse is clicked on the canvas
         {
             Point position = e.GetPosition(PixelCanvas); // get the position of the mouse click (relative to the canvas)
@@ -54,6 +49,7 @@ namespace PixelArtEditor
             int[] cooridantes = { x, y };
             if (mySet.Contains(cooridantes) == false) // Provjerava jel su koordinate vec u setu
             {
+                CheckColor();
 
 
 
@@ -109,7 +105,15 @@ namespace PixelArtEditor
 
 
         }
+        private void CheckColor() //Provjerava boju selektiranu na color pickeru i onda je primjenjuje na brush
+        {
+            var picker_selected_color = ColorPickerButton.SelectedColor;
 
+            if (picker_selected_color.HasValue)
+            {
+                selected_color = new SolidColorBrush(picker_selected_color.Value);
+            }
+        }
         internal class IntArrayComparer : IEqualityComparer<int[]>
         {
             public bool Equals(int[] x, int[] y)
@@ -133,12 +137,6 @@ namespace PixelArtEditor
 
         }
 
-        private void Color_Picker_Window(object sender, RoutedEventArgs e)
-        {
-            var selectionWindow = new View.Windows.ColorSelectionBox();
-            selectionWindow.Owner = this;
-            selectionWindow.Show();
 
-        }
     }
 }
