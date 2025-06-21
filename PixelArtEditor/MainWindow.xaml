@@ -28,7 +28,7 @@
              Background="Gray"
              Height="416"
              Width="416"
-             MouseDown="Canvas_MouseDown" Margin="10,10,274,74"
+             Margin="10,10,274,74"
              Grid.Row="0">
 
             </Canvas>

@@ -27,10 +27,12 @@ namespace PixelArtEditor
     {
         private int pixelSize = 13;
         private int pixels_placed = 0;
+        private bool isDrawing = false;
         private HashSet<int[]> mySet = new HashSet<int[]>(new IntArrayComparer());
         private readonly DispatcherTimer _timer = new();
         private readonly Brush[] _colors = new Brush[]
-{
+
+        {
         Brushes.Red, Brushes.Green, Brushes.Blue, Brushes.Orange, Brushes.Purple};
         private int _colorIndex = 0; // Index for the current color in the array
         public Brush selected_color = Brushes.Red; // Default boja
@@ -40,14 +42,17 @@ namespace PixelArtEditor
 
             InitializeComponent();
             DrawGrid();
+            PixelCanvas.MouseDown += Canvas_MouseDown;
+            PixelCanvas.MouseMove += Canvas_MouseMove;
+            PixelCanvas.MouseUp += Canvas_MouseUp;
         }
-        private void Canvas_MouseDown(object sender, MouseButtonEventArgs e) // when the mouse is clicked on the canvas
+        private void DrawPixel(object sender, MouseButtonEventArgs e)
         {
             Point position = e.GetPosition(PixelCanvas); // get the position of the mouse click (relative to the canvas)
             int x = (int)(position.X / pixelSize) * pixelSize; // calculate the x coordinate of the pixel
             int y = (int)(position.Y / pixelSize) * pixelSize; // calculate the y coordinate of the pixel
             int[] cooridantes = { x, y };
-            if (mySet.Contains(cooridantes) == false) // Provjerava jel su koordinate vec u setu
+            if (mySet.Contains(cooridantes) == false && e.ButtonState == e.LeftButton) // Provjerava jel su koordinate vec u setu
             {
                 CheckColor();
 
@@ -66,6 +71,29 @@ namespace PixelArtEditor
                 PixelCanvas.Children.Add(pixel); // add the rectangle to the canvas
                 pixels_placed++;
                 mySet.Add(cooridantes);
+            }
+        }
+        private void Canvas_MouseDown(object sender, MouseButtonEventArgs e) 
+        {
+            isDrawing = true;
+            DrawPixel(sender, e);
+
+        }
+        private void Canvas_MouseUp(object sender, MouseButtonEventArgs e) 
+        {
+            isDrawing = false;
+        }
+        private void Canvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDrawing && e.LeftButton == MouseButtonState.Pressed)
+            {
+                // Convert MouseEventArgs to MouseButtonEventArgs before passing to DrawPixel
+                var mouseButtonEventArgs = new MouseButtonEventArgs(e.MouseDevice, e.Timestamp, MouseButton.Left)
+                {
+                    RoutedEvent = MouseLeftButtonDownEvent,
+                    Source = e.Source
+                };
+                DrawPixel(sender, mouseButtonEventArgs);
             }
         }
 
