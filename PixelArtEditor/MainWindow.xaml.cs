@@ -46,15 +46,56 @@ namespace PixelArtEditor
             PixelCanvas.MouseMove += Canvas_MouseMove;
             PixelCanvas.MouseUp += Canvas_MouseUp;
         }
-        private void DrawPixel(object sender, MouseButtonEventArgs e)
+        private void Create_Pixel(int[] cooridantes, int x,int y)
+        {
+            CheckColor();
+
+
+
+            Rectangle pixel = new Rectangle // create a rectangle to represent the pixel
+            {
+                Width = pixelSize, // set the width of the rectangle
+                Height = pixelSize, // set the height of the rectangle
+                Fill = selected_color, // set the color of the rectangle
+                Stroke = Brushes.Black, // set the border color of the rectangle
+                StrokeThickness = 0 // set the border thickness of the rectangle
+            };
+            Canvas.SetLeft(pixel, x); // set the x coordinate of the rectangle
+            Canvas.SetTop(pixel, y); // set the y coordinate of the rectangle
+            PixelCanvas.Children.Add(pixel); // add the rectangle to the canvas
+            pixels_placed++;
+            mySet.Add(cooridantes);
+        }
+        private void DrawPixel(object sender,MouseButtonEventArgs e)
         {
             Point position = e.GetPosition(PixelCanvas); // get the position of the mouse click (relative to the canvas)
             int x = (int)(position.X / pixelSize) * pixelSize; // calculate the x coordinate of the pixel
             int y = (int)(position.Y / pixelSize) * pixelSize; // calculate the y coordinate of the pixel
             int[] cooridantes = { x, y };
+            Brush rectangleColor = GetRectangleColor(x, y);
+
+
             if (mySet.Contains(cooridantes) == false && e.ButtonState == e.LeftButton) // Provjerava jel su koordinate vec u setu
             {
-                CheckColor();
+                Create_Pixel(cooridantes, x, y);
+            }
+            else if (mySet.Contains(cooridantes) && e.ButtonState == e.LeftButton)
+            {
+                foreach (var child in PixelCanvas.Children)
+                {
+                    if (child is Rectangle rectangle)
+                    {
+                        double left = Canvas.GetLeft(rectangle);
+                        double top = Canvas.GetTop(rectangle);
+                        if (left == x && top == y)
+                        {
+                            PixelCanvas.Children.Remove(rectangle); 
+                            mySet.Remove(cooridantes);
+                            break;
+                        }
+                    }
+                }
+                Create_Pixel(cooridantes, x, y);
 
 
 
@@ -71,7 +112,23 @@ namespace PixelArtEditor
                 PixelCanvas.Children.Add(pixel); // add the rectangle to the canvas
                 pixels_placed++;
                 mySet.Add(cooridantes);
+
             }
+        }
+        private Brush GetRectangleColor(int x, int y)
+        {
+            foreach (var child in PixelCanvas.Children) {
+            if (child is Rectangle rectangle)
+                {
+                    double left = Canvas.GetLeft(rectangle);
+                    double top = Canvas.GetTop(rectangle);
+                    if (left == x && top == y)
+                    {
+                        return rectangle.Fill; // Return the color of the rectangle
+                    }
+                }
+            }
+            return null;
         }
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e) 
         {
