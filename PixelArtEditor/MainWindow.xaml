@@ -32,7 +32,7 @@
              Grid.Row="0">
 
             </Canvas>
-            
+
             <Grid Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -50,8 +50,31 @@
                     Grid.Column="0"
                     x:Name="ColorPickerButton"
                     />
+                <Button
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    x:Name="Eraser"
+                    Content="Eraser"
+                    Click="Eraser_Click"
+                    
+                    />
+                <Button
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    x:Name="Brush"
+                    Content="Brush"
+                    Click="Brush_Click"
+                    
+                    />
+                <TextBlock
+                    x:Name="DebugTB"
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Text="Textblock for debugging"
+                    FontSize="13"
+                    />
             </Grid>
-            
+
 
 
         </Grid>
