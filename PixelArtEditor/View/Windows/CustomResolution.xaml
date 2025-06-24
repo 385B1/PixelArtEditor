@@ -1,0 +1,16 @@
+﻿<Window x:Class="PixelArtEditor.CustomResolution"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PixelArtEditor"
+        mc:Ignorable="d"
+        Title="Custom Resolution" Height="110" Width="110"
+        ResizeMode="NoResize">
+    <Grid>
+        <Label Content="Value" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="Input" HorizontalAlignment="Center" Margin="0,25,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="72"/>
+        <Button Content="Set" HorizontalAlignment="Center" Margin="0,50,0,0" VerticalAlignment="Top" Click="Set_value"/>
+
+    </Grid>
+</Window>

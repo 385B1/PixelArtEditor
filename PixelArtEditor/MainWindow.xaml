@@ -22,6 +22,7 @@
                 <MenuItem Header="_32x32" Click="Res_32"/>
                 <MenuItem Header="_64x64" Click="Res_64"/>
                 <MenuItem Header="_16x16" Click="Res_16"/>
+                <MenuItem Header="_Custom" Click="Custom"/>
             </MenuItem>
         </Menu>
         <Grid>

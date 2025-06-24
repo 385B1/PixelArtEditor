@@ -27,12 +27,16 @@ namespace PixelArtEditor
     }
     public partial class MainWindow
     {
-        private void New_Click(object sender, RoutedEventArgs e)
+        public void Clear()
         {
             PixelCanvas.Children.Clear();
             mySet.Clear();
             pixels_placed = 0;
             DrawGrid();
+        }
+        private void New_Click(object sender, RoutedEventArgs e)
+        {
+            Clear();
         }
 
         private void Open_Click(object sender, RoutedEventArgs e)
@@ -78,6 +82,14 @@ namespace PixelArtEditor
             pixelSize = 26;
             DrawGrid();
             
+        }
+
+        private void Custom(object sender, RoutedEventArgs e)
+        { 
+            CustomResolution customResolution = new CustomResolution();
+            customResolution.Owner = this; // Set the owner of the custom resolution window to this main window
+            customResolution.WindowStartupLocation = WindowStartupLocation.CenterOwner; // Center the custom resolution window over the main window
+            customResolution.ShowDialog(); // Show the custom resolution window as a dialog
         }
 
         private void SaveCanvasToFile()

@@ -25,7 +25,7 @@ namespace PixelArtEditor
 
     public partial class MainWindow : Window
     {
-        private double pixelSize = 13;
+        public double pixelSize = 13;
         private int pixels_placed = 0;
         private bool isDrawing = false;
         private HashSet<double[]> mySet = new HashSet<double[]>(new DoubleArrayComparer());
