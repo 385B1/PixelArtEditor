@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         ResizeMode="CanMinimize"
         Title="MainWindow" 
-        Height="470" Width="700">
+        Height="490" Width="700">
     <DockPanel Margin="0,0,0,0">
         <Menu DockPanel.Dock="Top" Background="#CFCFCF">
             <MenuItem Header="_File">
@@ -17,6 +17,11 @@
                 <MenuItem Header="_Save" Click="Save_Click"/>
                 <Separator />
                 <MenuItem Header="E_xit" Click="Exit_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Resolution">
+                <MenuItem Header="_32x32" Click="Res_32"/>
+                <MenuItem Header="_64x64" Click="Res_64"/>
+                <MenuItem Header="_16x16" Click="Res_16"/>
             </MenuItem>
         </Menu>
         <Grid>

@@ -50,6 +50,36 @@ namespace PixelArtEditor
             this.Close(); // Closes the app
         }
 
+        private void Res_64(object sender, RoutedEventArgs e)
+        {
+            PixelCanvas.Children.Clear();
+            mySet.Clear();
+            pixels_placed = 0;
+            pixelSize = 6.5;
+            DrawGrid();
+            
+        }
+
+        private void Res_32(object sender, RoutedEventArgs e)
+        {
+            PixelCanvas.Children.Clear();
+            mySet.Clear();
+            pixels_placed = 0;
+            pixelSize = 13;
+            DrawGrid();
+            
+        }
+
+        private void Res_16(object sender, RoutedEventArgs e)
+        {
+            PixelCanvas.Children.Clear();
+            mySet.Clear();
+            pixels_placed = 0;
+            pixelSize = 26;
+            DrawGrid();
+            
+        }
+
         private void SaveCanvasToFile()
         {
             var dataList = new List<RectangleData>();
@@ -112,7 +142,7 @@ namespace PixelArtEditor
                         Canvas.SetLeft(pixel, data.X);
                         Canvas.SetTop(pixel, data.Y);
                         PixelCanvas.Children.Add(pixel);
-                        mySet.Add(new[] { (int)data.X, (int)data.Y });
+                        mySet.Add(new[] { (double)data.X, (double)data.Y });
                         pixels_placed++;
                     }
                 }

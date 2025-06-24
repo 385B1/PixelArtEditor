@@ -25,10 +25,10 @@ namespace PixelArtEditor
 
     public partial class MainWindow : Window
     {
-        private int pixelSize = 13;
+        private double pixelSize = 13;
         private int pixels_placed = 0;
         private bool isDrawing = false;
-        private HashSet<int[]> mySet = new HashSet<int[]>(new IntArrayComparer());
+        private HashSet<double[]> mySet = new HashSet<double[]>(new DoubleArrayComparer());
         private readonly DispatcherTimer _timer = new();
         private string draw_state = "draw"; // Deafult state za canvas je draw
         private readonly Brush[] _colors = new Brush[]
@@ -47,7 +47,7 @@ namespace PixelArtEditor
             PixelCanvas.MouseMove += Canvas_MouseMove;
             PixelCanvas.MouseUp += Canvas_MouseUp;
         }
-        private void Create_Pixel(int[] cooridantes, int x, int y) // Kod za kreiranje pixela
+        private void Create_Pixel(double[] cooridantes, double x, double y) // Kod za kreiranje pixela
         {
             CheckColor();
 
@@ -67,7 +67,7 @@ namespace PixelArtEditor
             pixels_placed++;
             mySet.Add(cooridantes);
         }
-        private void Delete_Pixel(int[] cooridantes, int x, int y) // Kod za brisanje pixela
+        private void Delete_Pixel(double[] cooridantes, double x, double y) // Kod za brisanje pixela
         {
             foreach (var child in PixelCanvas.Children)
             {
@@ -87,9 +87,9 @@ namespace PixelArtEditor
         private void DrawPixel(object sender, MouseButtonEventArgs e)
         {
             Point position = e.GetPosition(PixelCanvas); // get the position of the mouse click (relative to the canvas)
-            int x = (int)(position.X / pixelSize) * pixelSize; // calculate the x coordinate of the pixel
-            int y = (int)(position.Y / pixelSize) * pixelSize; // calculate the y coordinate of the pixel
-            int[] cooridantes = { x, y };
+            double x = (int)(position.X / pixelSize) * pixelSize; // calculate the x coordinate of the pixel
+            double y = (int)(position.Y / pixelSize) * pixelSize; // calculate the y coordinate of the pixel
+            double[] cooridantes = { x, y };
             Brush rectangleColor = GetRectangleColor(x, y);
 
             if (draw_state == "draw")
@@ -114,7 +114,7 @@ namespace PixelArtEditor
     
 
 
-        private Brush GetRectangleColor(int x, int y)
+        private Brush GetRectangleColor(double x, double y)
         {
             foreach (var child in PixelCanvas.Children) {
             if (child is Rectangle rectangle)
@@ -157,7 +157,7 @@ namespace PixelArtEditor
         private void DrawGrid()
         {
 
-            for (int x = 0; x <= PixelCanvas.Width; x += pixelSize) // draw vertical lines
+            for (double x = 0; x <= PixelCanvas.Width; x += pixelSize) // draw vertical lines
             {
                 Line verticalLine = new Line
                 {
@@ -173,7 +173,7 @@ namespace PixelArtEditor
 
             }
 
-            for (int y = 0; y <= PixelCanvas.Height; y += pixelSize) // draw horizontal lines
+            for (double y = 0; y <= PixelCanvas.Height; y += pixelSize) // draw horizontal lines
             {
                 Line horizontalLine = new Line
                 {
@@ -198,23 +198,23 @@ namespace PixelArtEditor
                 selected_color = new SolidColorBrush(picker_selected_color.Value);
             }
         }
-        internal class IntArrayComparer : IEqualityComparer<int[]>
+        internal class DoubleArrayComparer : IEqualityComparer<double[]>
         {
-            public bool Equals(int[] x, int[] y)
+            public bool Equals(double[] x, double[] y)
             {
                 if (x == null || y == null)
                     return x == y;
                 return x.SequenceEqual(y);
             }
 
-            public int GetHashCode(int[] obj)
+            public int GetHashCode(double[] obj)
             {
                 if (obj == null) return 0;
                 unchecked
                 {
                     int hash = 17;
-                    foreach (int item in obj)
-                        hash = hash * 31 + item;
+                    foreach (double item in obj)
+                        hash = hash * 31 + (int)item;
                     return hash;
                 }
             }
