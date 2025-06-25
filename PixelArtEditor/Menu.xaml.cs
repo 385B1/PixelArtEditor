@@ -56,40 +56,57 @@ namespace PixelArtEditor
 
         private void Res_64(object sender, RoutedEventArgs e)
         {
-            PixelCanvas.Children.Clear();
-            mySet.Clear();
-            pixels_placed = 0;
-            pixelSize = 6.5;
-            DrawGrid();
-            
+            var result = MessageBox.Show("Everything drawn will be cleared. Do you want to proceed",
+            "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                PixelCanvas.Children.Clear();
+                mySet.Clear();
+                pixels_placed = 0;
+                pixelSize = 6.5;
+                DrawGrid();
+            }
         }
 
         private void Res_32(object sender, RoutedEventArgs e)
         {
-            PixelCanvas.Children.Clear();
-            mySet.Clear();
-            pixels_placed = 0;
-            pixelSize = 13;
-            DrawGrid();
-            
+            var result = MessageBox.Show("Everything drawn will be cleared. Do you want to proceed",
+            "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                PixelCanvas.Children.Clear();
+                mySet.Clear();
+                pixels_placed = 0;
+                pixelSize = 13;
+                DrawGrid();
+            }
         }
 
         private void Res_16(object sender, RoutedEventArgs e)
         {
-            PixelCanvas.Children.Clear();
-            mySet.Clear();
-            pixels_placed = 0;
-            pixelSize = 26;
-            DrawGrid();
-            
+            var result = MessageBox.Show("Everything drawn will be cleared. Do you want to proceed",
+            "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                PixelCanvas.Children.Clear();
+                mySet.Clear();
+                pixels_placed = 0;
+                pixelSize = 26;
+                DrawGrid();
+            }
         }
 
         private void Custom(object sender, RoutedEventArgs e)
-        { 
-            CustomResolution customResolution = new CustomResolution();
-            customResolution.Owner = this; // Set the owner of the custom resolution window to this main window
-            customResolution.WindowStartupLocation = WindowStartupLocation.CenterOwner; // Center the custom resolution window over the main window
-            customResolution.ShowDialog(); // Show the custom resolution window as a dialog
+        {
+            var result = MessageBox.Show("Everything drawn will be cleared. Do you want to proceed",
+                "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                CustomResolution customResolution = new CustomResolution();
+                customResolution.Owner = this; // Set the owner of the custom resolution window to this main window
+                customResolution.WindowStartupLocation = WindowStartupLocation.CenterOwner; // Center the custom resolution window over the main window
+                customResolution.ShowDialog(); // Show the custom resolution window as a dialog
+            }
         }
 
         private void SaveCanvasToFile()
