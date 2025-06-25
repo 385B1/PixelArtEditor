@@ -92,6 +92,11 @@
                     Fill="Red"
                     />
                 </Grid>
+                <Button
+                    x:Name="BucketFill"
+                    Grid.Row="1"
+                    Content="Bucket Fill"
+                    Click="BucketFill_Click"/>
                 <TextBlock
                     x:Name="DebugTB"
                     Grid.Row="3"

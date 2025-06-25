@@ -14,9 +14,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-
-
-
 namespace PixelArtEditor
 {
     /// <summary>
@@ -51,8 +48,6 @@ namespace PixelArtEditor
         {
             CheckColor();
 
-
-
             Rectangle pixel = new Rectangle // create a rectangle to represent the pixel
             {
                 Width = pixelSize, // set the width of the rectangle
@@ -84,6 +79,122 @@ namespace PixelArtEditor
                 }
             }
         }
+        private List<Rectangle> GetConnectedRectangles(double startX, double startY)
+        {
+            // DFS alogritam za listu svih spojenih rectangleova, ovo je Copilot napisao.
+            var result = new List<Rectangle>();
+            var visited = new HashSet<(double, double)>();
+            var queue = new Queue<(double, double)>();
+
+            // Get the starting rectangle and its color
+            Rectangle startRect = null;
+            Color? targetColor = null;
+            foreach (var child in PixelCanvas.Children)
+            {
+                if (child is Rectangle rect)
+                {
+                    double left = Canvas.GetLeft(rect);
+                    double top = Canvas.GetTop(rect);
+                    if (left == startX && top == startY)
+                    {
+                        startRect = rect;
+                        if (rect.Fill is SolidColorBrush brush)
+                            targetColor = brush.Color;
+                        break;
+                    }
+                }
+            }
+            if (startRect == null || targetColor == null)
+                return result;
+
+            queue.Enqueue((startX, startY));
+            visited.Add((startX, startY));
+
+            while (queue.Count > 0)
+            {
+                var (x, y) = queue.Dequeue();
+
+                // Find the rectangle at (x, y)
+                Rectangle currentRect = null;
+                foreach (var child in PixelCanvas.Children)
+                {
+                    if (child is Rectangle rect)
+                    {
+                        double left = Canvas.GetLeft(rect);
+                        double top = Canvas.GetTop(rect);
+                        if (left == x && top == y)
+                        {
+                            currentRect = rect;
+                            break;
+                        }
+                    }
+                }
+                if (currentRect == null)
+                    continue;
+
+                result.Add(currentRect);
+
+                // Check 4 neighbors (up, down, left, right)
+                double[] dx = { -pixelSize, pixelSize, 0, 0 };
+                double[] dy = { 0, 0, -pixelSize, pixelSize };
+
+                for (int i = 0; i < 4; i++)
+                {
+                    double nx = x + dx[i];
+                    double ny = y + dy[i];
+                    if (visited.Contains((nx, ny)))
+                        continue;
+
+                    // Find neighbor rectangle and check color
+                    foreach (var child in PixelCanvas.Children)
+                    {
+                        if (child is Rectangle neighborRect)
+                        {
+                            double left = Canvas.GetLeft(neighborRect);
+                            double top = Canvas.GetTop(neighborRect);
+                            if (left == nx && top == ny && neighborRect.Fill is SolidColorBrush neighborBrush && neighborBrush.Color == targetColor)
+                            {
+                                queue.Enqueue((nx, ny));
+                                visited.Add((nx, ny));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+        private void Fill_Bucket(double x, double y, Brush color)
+        {
+            Color? targetColor = null;
+            if (color is SolidColorBrush solidBrush)
+                targetColor = solidBrush.Color;
+
+            if (targetColor == null)
+                return;
+            Brush color_selected = Brushes.Transparent;
+            if (ColorPickerButton.SelectedColor.HasValue)
+            {
+                color_selected = new SolidColorBrush(ColorPickerButton.SelectedColor.Value);
+            }
+
+            List<Rectangle> neighbors = GetConnectedRectangles(x, y);
+            foreach (var child in neighbors)
+            {
+                    double left = Canvas.GetLeft(child);
+                    double top = Canvas.GetTop(child);
+                    double[] cooridantes = { left, top };
+                    PixelCanvas.Children.Remove(child);
+                    mySet.Remove(cooridantes);
+            }
+            foreach (var child in neighbors)
+            {
+                double[] coordinates = { Canvas.GetLeft(child), Canvas.GetTop(child) };
+                Create_Pixel(coordinates, coordinates[0], coordinates[1]);
+            }
+            
+        }
         private void DrawPixel(object sender, MouseButtonEventArgs e)
         {
             Point position = e.GetPosition(PixelCanvas); // get the position of the mouse click (relative to the canvas)
@@ -108,6 +219,15 @@ namespace PixelArtEditor
             else if (draw_state == "erase") 
             {
                 Delete_Pixel(cooridantes, x, y);
+            }
+            else if (draw_state == "bucket_fill")
+            {
+                Fill_Bucket(x, y, rectangleColor);
+                Fill_Bucket(x, y, rectangleColor);
+
+                // Dva puta radim call zato sto ako samo jedanput iz
+                // nekog razloga ne radi, ovo je najbolji bug fix koji sam napravio u zivotu...
+
             }
         }
     
@@ -258,6 +378,12 @@ namespace PixelArtEditor
         {
             draw_state = "color_dropper";
             DebugTB.Text = "Color dropper mode selected";
+        }
+
+        private void BucketFill_Click(object sender, RoutedEventArgs e)
+        {
+            draw_state= "bucket_fill";
+            DebugTB.Text = "Bucket fill mode selected";
         }
     }
 }
