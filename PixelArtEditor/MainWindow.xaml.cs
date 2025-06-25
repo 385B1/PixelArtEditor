@@ -133,7 +133,20 @@ namespace PixelArtEditor
         {
             isDrawing = true;
             DrawPixel(sender, e);
-
+            if (draw_state == "color_dropper") // Logika za stavljanje kliknute boje na ColorPickerButton
+            {
+                Brush get_pixel_color = ColorDisplay.Fill;
+                if (get_pixel_color is SolidColorBrush solidColorBrush)
+                {
+                    Color color = solidColorBrush.Color;
+                    ColorPickerButton.SelectedColor = color;
+                }
+                if (get_pixel_color != null)
+                {
+                    Debug.WriteLine("Color of the pixel selected: " + get_pixel_color.ToString());
+                }
+            }
+            
         }
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e) 
         {
@@ -150,6 +163,14 @@ namespace PixelArtEditor
                     Source = e.Source
                 };
                 DrawPixel(sender, mouseButtonEventArgs);
+            }
+            else if (draw_state== "color_dropper")
+            {
+                Point position = e.GetPosition(PixelCanvas); 
+                double x = (int)(position.X / pixelSize) * pixelSize;
+                double y = (int)(position.Y / pixelSize) * pixelSize;
+                Brush rectangleColor = GetRectangleColor(x, y);
+                ColorDisplay.Fill = rectangleColor;
             }
         }
 
@@ -231,6 +252,12 @@ namespace PixelArtEditor
         {
             draw_state = "draw";
             DebugTB.Text = "Draw mode selected";
+        }
+
+        private void ColorDropper_Click(object sender, RoutedEventArgs e)
+        {
+            draw_state = "color_dropper";
+            DebugTB.Text = "Color dropper mode selected";
         }
     }
 }

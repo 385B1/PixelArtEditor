@@ -72,6 +72,26 @@
                     Click="Brush_Click"
                     
                     />
+                <Grid
+                    Grid.Row="2"
+                    Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button
+                    x:Name="ColorDropper"
+                    Content="Color Picker"
+                    Click="ColorDropper_Click"
+                    />
+                    <Rectangle
+                    Grid.Column="1"
+                    x:Name="ColorDisplay"
+                    Width="30"
+                    Height="30"
+                    Fill="Red"
+                    />
+                </Grid>
                 <TextBlock
                     x:Name="DebugTB"
                     Grid.Row="3"
