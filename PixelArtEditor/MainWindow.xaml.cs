@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Xceed.Wpf.Toolkit;
 
 namespace PixelArtEditor
 {
@@ -26,17 +27,38 @@ namespace PixelArtEditor
         private int pixels_placed = 0;
         private bool isDrawing = false;
         private HashSet<double[]> mySet = new HashSet<double[]>(new DoubleArrayComparer());
+        private int step_count = -1; // Counter for steps in undo/redo functionality
+        private bool buffer_isFull = false; // Flag to indicate if the buffer is full
         private readonly DispatcherTimer _timer = new();
         private string draw_state = "draw"; // Deafult state za canvas je draw
         private readonly Brush[] _colors = new Brush[]
 
         {
         Brushes.Red, Brushes.Green, Brushes.Blue, Brushes.Orange, Brushes.Purple};
+
+        public class Pixel
+        {
+            public double X { get; set; } // X coordinate of the pixel
+            public double Y { get; set; } // Y coordinate of the pixel
+            public Brush Color { get; set; } // Color of the pixel
+            public Pixel(double x, double y, Brush color) // Constructor for the Pixel class
+            {
+                X = x;
+                Y = y;
+                Color = color;
+            }
+        }
+
+        private List<HashSet<Pixel?>> pixels = new List<HashSet<Pixel?>>(); // List to store pixels
         private int _colorIndex = 0; // Index for the current color in the array
         public Brush selected_color = Brushes.Red; // Default boja
 
         public MainWindow() // when the application starts
         {
+            for (int i = 0; i < 20; i++) // Initialize the list with empty sets
+            {
+                pixels.Add(new HashSet<Pixel?>(new PixelComparer()));
+            }
 
             InitializeComponent();
             DrawGrid();
@@ -265,12 +287,46 @@ namespace PixelArtEditor
                 {
                     Debug.WriteLine("Color of the pixel selected: " + get_pixel_color.ToString());
                 }
+            } else
+            {
+                for (int i = step_count + 1; i < 20; i++)
+                {
+                    pixels[i] = new HashSet<Pixel?>(new PixelComparer()); // Clear the pixel sets for steps after the current step
+                }
             }
             
         }
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e) 
         {
             isDrawing = false;
+
+            if (step_count >= 19) // If the step count exceeds 19, the buffer is considered full, delete the oldest step every time when adding a new one
+            {
+                step_count = 19;
+                buffer_isFull = true; // Set the flag to indicate that the buffer is full
+            }
+
+            if (buffer_isFull == false) // If the buffer is not full, increment the step count
+            {
+                step_count++;
+            }
+
+            if (buffer_isFull) // If the buffer is full, remove the oldest step
+            {
+                pixels.RemoveAt(0); // Remove the first pixel set (oldest)
+                pixels.Add(new HashSet<Pixel?>(new PixelComparer())); // Add a new empty pixel set at the end
+            }
+
+            foreach (var child in PixelCanvas.Children)
+            {
+                if (child is Rectangle rectangle)
+                {
+                    double X = Canvas.GetLeft(rectangle);
+                    double Y = Canvas.GetTop(rectangle);
+                    var color = rectangle.Fill;
+                    pixels[step_count].Add(new Pixel(X, Y, color)); // Add the pixel to the current step
+                }
+            }
         }
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
@@ -362,6 +418,28 @@ namespace PixelArtEditor
 
         }
 
+        internal class PixelComparer : IEqualityComparer<Pixel?>
+        {
+            public bool Equals(Pixel? x, Pixel? y)
+            {
+                if (x == null || y == null)
+                    return x == y;
+                return x.X == y.X && x.Y == y.Y && x.Color == y.Color;
+            }
+            public int GetHashCode(Pixel? obj)
+            {
+                if (obj == null) return 0;
+                unchecked
+                {
+                    int hash = 17;
+                    hash = hash * 31 + obj.X.GetHashCode();
+                    hash = hash * 31 + obj.Y.GetHashCode();
+                    hash = hash * 31 + (obj.Color?.GetHashCode() ?? 0);
+                    return hash;
+                }
+            }
+        }
+
         private void Eraser_Click(object sender, RoutedEventArgs e)
         {
             draw_state = "erase";
@@ -384,6 +462,91 @@ namespace PixelArtEditor
         {
             draw_state= "bucket_fill";
             DebugTB.Text = "Bucket fill mode selected";
+        }
+
+        private void Undo_Click(object sender, RoutedEventArgs e)
+        {
+            HashSet<Pixel?>? previousPixels = new HashSet<Pixel?>(new PixelComparer());
+
+            if (step_count >= 1)
+            {
+                step_count--;
+
+                previousPixels = pixels[step_count]; // Get the previous canvas state
+
+                buffer_isFull = false; // Reset the buffer full flag
+
+            }
+            else if (step_count <= 0)
+            {
+                if (step_count == 0)
+                {
+                    step_count--;
+                }
+
+                previousPixels = new HashSet<Pixel?>(new PixelComparer());
+
+                buffer_isFull = false;
+
+            }
+
+            Clear();
+
+            foreach (var Pixel in previousPixels) // Draw the entire previous canvas state
+            {
+                Rectangle pixel = new Rectangle // create a rectangle to represent the pixel
+                {
+                    Width = pixelSize, // set the width of the rectangle
+                    Height = pixelSize, // set the height of the rectangle
+                    Fill = Pixel.Color, // set the color of the rectangle
+                    Stroke = Brushes.Black, // set the border color of the rectangle
+                    StrokeThickness = 0 // set the border thickness of the rectangle
+                };
+                Canvas.SetLeft(pixel, Pixel.X); // set the x coordinate of the rectangle
+                Canvas.SetTop(pixel, Pixel.Y); // set the y coordinate of the rectangle
+                PixelCanvas.Children.Add(pixel); // add the rectangle to the canvas
+                pixels_placed++;
+                mySet.Add(new double[] { Pixel.X, Pixel.Y });
+            }
+        }
+
+        private void Redo_Click(object sender, RoutedEventArgs e)
+        {
+            HashSet<Pixel?>? previousPixels = new HashSet<Pixel?>(new PixelComparer());
+
+            if (step_count <= 18)
+            {
+                step_count++;
+
+                previousPixels = pixels[step_count]; // Get the previous pixels
+
+                if (previousPixels.Count != 0)
+                {
+
+                    Clear();
+
+                    foreach (var Pixel in previousPixels) // Iterate through the previous pixels
+                    {
+                        Rectangle pixel = new Rectangle // create a rectangle to represent the pixel
+                        {
+                            Width = pixelSize, // set the width of the rectangle
+                            Height = pixelSize, // set the height of the rectangle
+                            Fill = Pixel.Color, // set the color of the rectangle
+                            Stroke = Brushes.Black, // set the border color of the rectangle
+                            StrokeThickness = 0 // set the border thickness of the rectangle
+                        };
+                        Canvas.SetLeft(pixel, Pixel.X); // set the x coordinate of the rectangle
+                        Canvas.SetTop(pixel, Pixel.Y); // set the y coordinate of the rectangle
+                        PixelCanvas.Children.Add(pixel); // add the rectangle to the canvas
+                        pixels_placed++;
+                        mySet.Add(new double[] { Pixel.X, Pixel.Y });
+                    }
+                }
+                else
+                {
+                    step_count--;
+                }
+            }
         }
     }
 }

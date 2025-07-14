@@ -37,6 +37,11 @@ namespace PixelArtEditor
         private void New_Click(object sender, RoutedEventArgs e)
         {
             Clear();
+            step_count = -1; // Reset step count
+            for (int i = 0; i < 20; i++) // Initialize the list with empty sets
+            {
+                pixels[i] = new HashSet<Pixel?>(new PixelComparer());
+            }
         }
 
         private void Open_Click(object sender, RoutedEventArgs e)

@@ -24,6 +24,10 @@
                 <MenuItem Header="_16x16" Click="Res_16"/>
                 <MenuItem Header="_Custom" Click="Custom"/>
             </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Undo" Click="Undo_Click"/>
+                <MenuItem Header="Redo" Click="Redo_Click"/>
+            </MenuItem>
         </Menu>
         <Grid>
             <Grid.ColumnDefinitions>
