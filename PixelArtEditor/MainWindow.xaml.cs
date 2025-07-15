@@ -29,6 +29,7 @@ namespace PixelArtEditor
         private HashSet<double[]> mySet = new HashSet<double[]>(new DoubleArrayComparer());
         private int step_count = -1; // Counter for steps in undo/redo functionality
         private bool buffer_isFull = false; // Flag to indicate if the buffer is full
+        private bool mouse_pressed = false; // Flag to indicate if the buffer is full
         private readonly DispatcherTimer _timer = new();
         private string draw_state = "draw"; // Deafult state za canvas je draw
         private readonly Brush[] _colors = new Brush[]
@@ -273,7 +274,10 @@ namespace PixelArtEditor
         }
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e) 
         {
+            Debug.WriteLine("Mouse pressed on the canvas");
+            Mouse.Capture(PixelCanvas); // Captures all mouse input to PixelCanvas
             isDrawing = true;
+            mouse_pressed = true; // Set the flag to indicate that the mouse is pressed
             DrawPixel(sender, e);
             if (draw_state == "color_dropper") // Logika za stavljanje kliknute boje na ColorPickerButton
             {
@@ -296,27 +300,10 @@ namespace PixelArtEditor
             }
             
         }
-        private void Canvas_MouseUp(object sender, MouseButtonEventArgs e) 
+
+        private bool CheckForChanges()
         {
-            isDrawing = false;
-
-            if (step_count >= 19) // If the step count exceeds 19, the buffer is considered full, delete the oldest step every time when adding a new one
-            {
-                step_count = 19;
-                buffer_isFull = true; // Set the flag to indicate that the buffer is full
-            }
-
-            if (buffer_isFull == false) // If the buffer is not full, increment the step count
-            {
-                step_count++;
-            }
-
-            if (buffer_isFull) // If the buffer is full, remove the oldest step
-            {
-                pixels.RemoveAt(0); // Remove the first pixel set (oldest)
-                pixels.Add(new HashSet<Pixel?>(new PixelComparer())); // Add a new empty pixel set at the end
-            }
-
+            HashSet<Pixel?> temp = new HashSet<Pixel?>(new PixelComparer()); // Get the current step
             foreach (var child in PixelCanvas.Children)
             {
                 if (child is Rectangle rectangle)
@@ -324,29 +311,90 @@ namespace PixelArtEditor
                     double X = Canvas.GetLeft(rectangle);
                     double Y = Canvas.GetTop(rectangle);
                     var color = rectangle.Fill;
-                    pixels[step_count].Add(new Pixel(X, Y, color)); // Add the pixel to the current step
+                    temp.Add(new Pixel(X, Y, color)); // Add the pixel to the current step
                 }
+            }
+            if (step_count > -1)
+            {
+                return !pixels[step_count].SetEquals(temp); // Check if the current step is different from the previous step
+            } else
+            {
+                return true;
+            }
+             
+        }
+        private void Canvas_MouseUp(object sender, MouseButtonEventArgs e) 
+        {
+            Mouse.Capture(null); // Release capture
+            if (mouse_pressed)
+            {
+                DebugTB.Text = step_count.ToString();
+
+                isDrawing = false;
+
+                if (step_count >= 19) // If the step count exceeds 19, the buffer is considered full, delete the oldest step every time when adding a new one
+                {
+                    step_count = 19;
+                    buffer_isFull = true; // Set the flag to indicate that the buffer is full
+                }
+
+                if (buffer_isFull == false) // If the buffer is not full, increment the step count
+                {
+
+                    if (step_count >= 0 && CheckForChanges()) // If there are pixels in the current step, increment the step count
+                    {
+                        step_count++;
+                    } else if (step_count == -1)
+                    {
+                        step_count++;
+                    }
+                }
+
+                if (buffer_isFull && CheckForChanges()) // If the buffer is full and there are changes, remove the oldest step
+                {
+                    pixels.RemoveAt(0); // Remove the first pixel set (oldest)
+                    pixels.Add(new HashSet<Pixel?>(new PixelComparer())); // Add a new empty pixel set at the end
+                }
+
+                foreach (var child in PixelCanvas.Children) // Add current canvas state the the current step
+                {
+                    if (child is Rectangle rectangle)
+                    {
+                        double X = Canvas.GetLeft(rectangle);
+                        double Y = Canvas.GetTop(rectangle);
+                        var color = rectangle.Fill;
+                        pixels[step_count].Add(new Pixel(X, Y, color)); // Add the pixel to the current step
+                    }
+                }
+
+                mouse_pressed = false; // Reset the mouse pressed flag
             }
         }
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isDrawing && e.LeftButton == MouseButtonState.Pressed)
+            Point mousePos = Mouse.GetPosition(PixelCanvas);
+            if (mousePos.X >= 0 && mousePos.Y >= 0 &&
+                mousePos.X <= PixelCanvas.ActualWidth &&
+                mousePos.Y <= PixelCanvas.ActualHeight)
             {
-                // Convert MouseEventArgs to MouseButtonEventArgs before passing to DrawPixel
-                var mouseButtonEventArgs = new MouseButtonEventArgs(e.MouseDevice, e.Timestamp, MouseButton.Left)
+                if (isDrawing && e.LeftButton == MouseButtonState.Pressed)
                 {
-                    RoutedEvent = MouseLeftButtonDownEvent,
-                    Source = e.Source
-                };
-                DrawPixel(sender, mouseButtonEventArgs);
-            }
-            else if (draw_state== "color_dropper")
-            {
-                Point position = e.GetPosition(PixelCanvas); 
-                double x = (int)(position.X / pixelSize) * pixelSize;
-                double y = (int)(position.Y / pixelSize) * pixelSize;
-                Brush rectangleColor = GetRectangleColor(x, y);
-                ColorDisplay.Fill = rectangleColor;
+                    // Convert MouseEventArgs to MouseButtonEventArgs before passing to DrawPixel
+                    var mouseButtonEventArgs = new MouseButtonEventArgs(e.MouseDevice, e.Timestamp, MouseButton.Left)
+                    {
+                        RoutedEvent = MouseLeftButtonDownEvent,
+                        Source = e.Source
+                    };
+                    DrawPixel(sender, mouseButtonEventArgs);
+                }
+                else if (draw_state == "color_dropper")
+                {
+                    Point position = e.GetPosition(PixelCanvas);
+                    double x = (int)(position.X / pixelSize) * pixelSize;
+                    double y = (int)(position.Y / pixelSize) * pixelSize;
+                    Brush rectangleColor = GetRectangleColor(x, y);
+                    ColorDisplay.Fill = rectangleColor;
+                }
             }
         }
 
