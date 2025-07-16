@@ -146,6 +146,71 @@ namespace PixelArtEditor
             }
         }
 
+        private void PlaceChildren()
+        {
+            foreach (var Pixel in pixels[step_count]) // Iterate through the previous pixels
+            {
+                Rectangle pixel = new Rectangle // create a rectangle to represent the pixel
+                {
+                    Width = pixelSize, // set the width of the rectangle
+                    Height = pixelSize, // set the height of the rectangle
+                    Fill = Pixel.Color, // set the color of the rectangle
+                    Stroke = Brushes.Black, // set the border color of the rectangle
+                    StrokeThickness = 0 // set the border thickness of the rectangle
+                };
+                Canvas.SetLeft(pixel, Pixel.X); // set the x coordinate of the rectangle
+                Canvas.SetTop(pixel, Pixel.Y); // set the y coordinate of the rectangle
+                PixelCanvas.Children.Add(pixel); // add the rectangle to the canvas
+                pixels_placed++;
+                mySet.Add(new double[] { Pixel.X, Pixel.Y });
+            }
+        }
+
+        private void SaveAsPng_Click(object sender, RoutedEventArgs e)
+        {
+
+
+            PixelCanvas.Children.Clear();
+            mySet.Clear();
+            pixels_placed = 0;
+
+            PlaceChildren(); // Place the children on the canvas before rendering
+
+            PixelCanvas.Measure(new Size(PixelCanvas.ActualWidth, PixelCanvas.ActualHeight));
+            PixelCanvas.Arrange(new Rect(new Size(PixelCanvas.ActualWidth, PixelCanvas.ActualHeight)));
+
+            RenderTargetBitmap renderBitmap = new RenderTargetBitmap(
+                (int)PixelCanvas.ActualWidth, 
+                (int)PixelCanvas.ActualHeight, 
+                96d, 96d, 
+                PixelFormats.Pbgra32);
+
+
+            renderBitmap.Render(PixelCanvas);
+
+            Clear();
+
+            PlaceChildren();
+
+            PngBitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
+
+            SaveFileDialog saveDialog = new SaveFileDialog
+            {
+                Filter = "PNG files (*.png)|*.png|All files (*.*)|*.*",
+                Title = "Save Pixel Art as PNG",
+                FileName = "pixel_art.png"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                using (FileStream file = File.Create(saveDialog.FileName))
+                {
+                    encoder.Save(file);
+                }
+            }
+        }
+
         private void LoadCanvasFromFile()
         {
             OpenFileDialog openDialog = new OpenFileDialog

@@ -14,7 +14,10 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_New" Click="New_Click"/>
                 <MenuItem Header="_Open" Click="Open_Click"/>
-                <MenuItem Header="_Save" Click="Save_Click"/>
+                <MenuItem Header="_Save">
+                    <MenuItem Header="_Save As JSON" Click="Save_Click"/>
+                    <MenuItem Header="_Save As PNG" Click="SaveAsPng_Click"/>
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="E_xit" Click="Exit_Click"/>
             </MenuItem>
@@ -109,13 +112,7 @@
                     FontSize="13"
                     />
             </Grid>
-
-
-
         </Grid>
 
     </DockPanel>
-   
-
-
 </Window>
